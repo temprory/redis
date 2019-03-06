@@ -185,7 +185,7 @@ func NewRedis(conf RedisConf) *Redis {
 		conf.keepaliveInterval = time.Second * 300
 	}
 
-	logInfo("db.NewRedis Connect To Redis ...")
+	logInfo("NewRedis Connect To Redis ...")
 
 	client := redis.NewClient(&redis.Options{
 		Network:            conf.Network,
@@ -205,7 +205,7 @@ func NewRedis(conf RedisConf) *Redis {
 	})
 	cmd := client.Ping()
 	if cmd.Err() != nil {
-		logFatal("db.NewRedis client.Ping() Failed: %v", cmd.Err())
+		logFatal("NewRedis client.Ping() Failed: %v", cmd.Err())
 	}
 
 	ticker := time.NewTicker(conf.keepaliveInterval)
@@ -215,12 +215,12 @@ func NewRedis(conf RedisConf) *Redis {
 				break
 			}
 			if err := client.Ping().Err(); err != nil {
-				logDebug("db.Redis Ping: %v", err)
+				logDebug("Redis Ping: %v", err)
 			}
 		}
 	})
 
-	logInfo("db.NewRedis Connect To Redis Success")
+	logInfo("NewRedis Connect To Redis Success")
 
 	return &Redis{
 		client:  client,
