@@ -229,18 +229,24 @@ func NewRedis(conf RedisConf) *Redis {
 	}
 }
 
-type RedisMgrConf struct {
-	Platforms map[string][]RedisConf
-}
+type RedisMgrConf map[string][]RedisConf
 
 type RedisMgr struct {
 	instances map[string][]*Redis
 }
 
-func (mgr *RedisMgr) GetRedis(platform string, idx int) *Redis {
-	pool, ok := mgr.instances[platform]
+func (mgr *RedisMgr) GetRedis(tag string, args ...interface{}) *Redis {
+	pool, ok := mgr.instances[tag]
 	if !ok {
 		return nil
+	}
+	idx := uint64(0)
+	if len(args) > 0 {
+		if i, ok := args[0].(int); ok {
+			idx = uint64(i)
+		} else {
+			idx = hash(fmt.Sprintf("%v", args[0]))
+		}
 	}
 	return pool[uint32(idx)%uint32(len(pool))]
 }
@@ -259,10 +265,10 @@ func NewRedisMgr(mgrConf RedisMgrConf) *RedisMgr {
 	}
 
 	total := 0
-	for platform, confs := range mgrConf.Platforms {
+	for tag, confs := range mgrConf {
 		sort.Sort(RedisConfArr(confs))
 		for _, conf := range confs {
-			mgr.instances[platform] = append(mgr.instances[platform], NewRedis(conf))
+			mgr.instances[tag] = append(mgr.instances[tag], NewRedis(conf))
 			total++
 		}
 
