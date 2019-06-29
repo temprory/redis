@@ -251,10 +251,10 @@ func (mgr *RedisMgr) Get(tag string, args ...interface{}) *Redis {
 	return pool[uint32(idx)%uint32(len(pool))]
 }
 
-func (mgr *RedisMgr) ForEach(cb func(*Redis)) {
-	for _, pool := range mgr.instances {
-		for _, rds := range pool {
-			cb(rds)
+func (mgr *RedisMgr) ForEach(cb func(string, int, *Redis)) {
+	for tag, pool := range mgr.instances {
+		for idx, rds := range pool {
+			cb(tag, idx, rds)
 		}
 	}
 }
