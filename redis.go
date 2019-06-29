@@ -37,19 +37,19 @@ type RedisConf struct {
 	idleCheckFrequency time.Duration
 }
 
-type RedisConfArr []RedisConf
+// type RedisConfArr []RedisConf
 
-func (arr RedisConfArr) Len() int {
-	return len(arr)
-}
+// func (arr RedisConfArr) Len() int {
+// 	return len(arr)
+// }
 
-func (arr RedisConfArr) Swap(i, j int) {
-	arr[i], arr[j] = arr[j], arr[i]
-}
+// func (arr RedisConfArr) Swap(i, j int) {
+// 	arr[i], arr[j] = arr[j], arr[i]
+// }
 
-func (arr RedisConfArr) Less(i, j int) bool {
-	return arr[i].ID > arr[j].ID
-}
+// func (arr RedisConfArr) Less(i, j int) bool {
+// 	return arr[i].ID > arr[j].ID
+// }
 
 type redisScript struct {
 	sync.Mutex
@@ -235,7 +235,7 @@ type RedisMgr struct {
 	instances map[string][]*Redis
 }
 
-func (mgr *RedisMgr) GetRedis(tag string, args ...interface{}) *Redis {
+func (mgr *RedisMgr) Get(tag string, args ...interface{}) *Redis {
 	pool, ok := mgr.instances[tag]
 	if !ok {
 		return nil
@@ -266,7 +266,9 @@ func NewRedisMgr(mgrConf RedisMgrConf) *RedisMgr {
 
 	total := 0
 	for tag, confs := range mgrConf {
-		sort.Sort(RedisConfArr(confs))
+		sort.Slice(confs, func(i, j int) bool {
+			return confs[i].ID > confs[j].ID
+		})
 		for _, conf := range confs {
 			mgr.instances[tag] = append(mgr.instances[tag], NewRedis(conf))
 			total++
