@@ -64,6 +64,7 @@ type Redis struct {
 	client  *redis.Client
 	ticker  *time.Ticker
 	scripts map[string]*redisScript
+	Conf    RedisConf
 }
 
 func (rds *Redis) Client() *redis.Client {
@@ -226,6 +227,7 @@ func NewRedis(conf RedisConf) *Redis {
 		client:  client,
 		scripts: map[string]*redisScript{},
 		ticker:  ticker,
+		Conf:    conf,
 	}
 }
 
